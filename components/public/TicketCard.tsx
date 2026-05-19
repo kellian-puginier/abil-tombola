@@ -6,28 +6,30 @@ import { cn, buyerShortLabel } from "@/lib/utils";
 import { formatEUR } from "@/lib/pricing";
 
 export default function TicketCard({ ticket }: { ticket: TicketWithBuyer }) {
-  const selected = useCartStore((s) =>
-    s.selectedTicketIds.includes(ticket.id)
-  );
+  const selected = useCartStore((s) => s.selectedTicketIds.includes(ticket.id));
   const toggle = useCartStore((s) => s.toggleTicket);
 
   const isBundle = ticket.is_bundle_member;
   const discounted = ticket.discount_price != null;
 
+  const numberBadge = ticket.ticket_number != null ? `N°${ticket.ticket_number}` : null;
+
   if (ticket.status === "won") {
     return (
       <div className="card relative overflow-hidden p-4 opacity-90">
-        <div className="absolute right-2 top-2 text-2xl">🏆</div>
-        <p className="font-display text-xl font-bold leading-tight">
-          {ticket.display_name}
-        </p>
+        <div className="absolute right-2 top-2 text-xl">🏆</div>
+        {numberBadge && (
+          <span className="mb-1 block text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
+            {numberBadge}
+          </span>
+        )}
+        <p className="font-display text-lg font-bold leading-tight">{ticket.display_name}</p>
+        {ticket.subtitle && (
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted-foreground)" }}>{ticket.subtitle}</p>
+        )}
         {ticket.buyer && (
-          <p className="mt-1 text-xs text-amber-700">
-            Gagnant&nbsp;: {buyerShortLabel(
-              ticket.buyer.buyer_first_name,
-              ticket.buyer.buyer_last_name,
-              ticket.buyer.buyer_club
-            )}
+          <p className="mt-1 text-xs" style={{ color: "oklch(0.65 0.15 83)" }}>
+            Gagnant : {buyerShortLabel(ticket.buyer.buyer_first_name, ticket.buyer.buyer_last_name, ticket.buyer.buyer_club)}
           </p>
         )}
       </div>
@@ -36,20 +38,24 @@ export default function TicketCard({ ticket }: { ticket: TicketWithBuyer }) {
 
   if (ticket.status === "sold") {
     return (
-      <div className="card relative overflow-hidden p-4 opacity-70">
-        <div className="absolute right-2 top-2 text-xs font-semibold text-slate-400">
-          VENDU
+      <div className="card relative overflow-hidden p-4 opacity-60">
+        <div className="absolute right-2 top-2 text-[10px] font-semibold uppercase" style={{ color: "var(--muted-foreground)" }}>
+          Vendu
         </div>
-        <p className="font-display text-xl font-bold leading-tight text-slate-600 line-through">
+        {numberBadge && (
+          <span className="mb-1 block text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
+            {numberBadge}
+          </span>
+        )}
+        <p className="font-display text-lg font-bold leading-tight line-through" style={{ color: "var(--muted-foreground)" }}>
           {ticket.display_name}
         </p>
+        {ticket.subtitle && (
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted-foreground)" }}>{ticket.subtitle}</p>
+        )}
         {ticket.buyer && (
-          <p className="mt-1 text-xs text-slate-500">
-            Pris par {buyerShortLabel(
-              ticket.buyer.buyer_first_name,
-              ticket.buyer.buyer_last_name,
-              ticket.buyer.buyer_club
-            )}
+          <p className="mt-1 text-xs" style={{ color: "var(--muted-foreground)" }}>
+            Pris par {buyerShortLabel(ticket.buyer.buyer_first_name, ticket.buyer.buyer_last_name, ticket.buyer.buyer_club)}
           </p>
         )}
       </div>
@@ -62,30 +68,54 @@ export default function TicketCard({ ticket }: { ticket: TicketWithBuyer }) {
       onClick={() => toggle(ticket.id)}
       className={cn(
         "card group relative overflow-hidden p-4 text-left transition",
-        "hover:-translate-y-0.5 hover:shadow-xl",
-        selected && "ring-2 ring-abil-green bg-emerald-50",
-        isBundle && "ring-2 ring-abil-gold"
+        "hover:-translate-y-0.5 hover:shadow-lg",
+        selected && "ring-2",
+        isBundle && "animate-glow"
       )}
+      style={
+        selected
+          ? { backgroundColor: "var(--accent)", outline: "2px solid var(--primary)", outlineOffset: "-2px" }
+          : isBundle
+            ? { borderColor: "var(--secondary)", borderWidth: "2px" }
+            : undefined
+      }
     >
       {discounted && (
-        <span className="absolute right-2 top-2 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-900 animate-sparkle">
+        <span
+          className="absolute right-2 top-2 animate-sparkle rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+          style={{ backgroundColor: "var(--secondary)", color: "var(--secondary-foreground)" }}
+        >
           Promo
         </span>
       )}
-      {isBundle && (
-        <span className="absolute right-2 top-2 rounded-full bg-abil-gold px-2 py-0.5 text-[10px] font-bold uppercase text-abil-ink">
+      {isBundle && !discounted && (
+        <span
+          className="absolute right-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+          style={{ backgroundColor: "var(--secondary)", color: "var(--secondary-foreground)" }}
+        >
           ×5
         </span>
       )}
-      <p className="font-display text-xl font-bold leading-tight">
+      {numberBadge && (
+        <span className="mb-1 block text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
+          {numberBadge}
+        </span>
+      )}
+      <p className="font-display text-lg font-bold leading-tight" style={{ color: "var(--foreground)" }}>
         {ticket.display_name}
       </p>
+      {ticket.subtitle && (
+        <p className="mt-0.5 text-xs" style={{ color: "var(--muted-foreground)" }}>{ticket.subtitle}</p>
+      )}
       {discounted && (
-        <p className="mt-2 text-sm font-semibold text-abil-green">
-          Prix spécial&nbsp;: {formatEUR(Number(ticket.discount_price))}
+        <p className="mt-2 text-sm font-semibold" style={{ color: "var(--primary)" }}>
+          Prix spécial : {formatEUR(Number(ticket.discount_price))}
         </p>
       )}
-      <p className="mt-2 text-xs text-slate-500 group-hover:text-abil-green">
+      <p
+        className="mt-2 text-xs transition-colors"
+        style={{ color: selected ? "var(--primary)" : "var(--muted-foreground)" }}
+      >
         {selected ? "✓ Dans le panier" : "Cliquer pour ajouter"}
       </p>
     </button>

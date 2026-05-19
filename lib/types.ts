@@ -8,6 +8,8 @@ export interface Ticket {
   id: string;
   player_name: string;
   display_name: string;
+  subtitle: string | null;
+  ticket_number: number | null;
   is_bundle_member: boolean;
   bundle_id: string | null;
   bundle_index: number | null;

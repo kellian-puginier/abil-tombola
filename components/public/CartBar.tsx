@@ -9,48 +9,46 @@ export default function CartBar({ tickets }: { tickets: TicketWithBuyer[] }) {
   const count = useCartStore((s) => s.ticketCount);
   const total = useCartStore((s) => s.optimalPrice);
   const breakdown = useCartStore((s) => s.priceBreakdown);
+  const selectedIds = useCartStore((s) => s.selectedTicketIds);
   const clear = useCartStore((s) => s.clearCart);
 
   if (count === 0) return null;
 
-  // Adjust total if any selected ticket has a discount_price: we still use
-  // the optimal-pack price for non-discounted tickets, but discounted
-  // tickets are added as standalone units at their override price.
-  const selectedIds = useCartStore.getState().selectedTicketIds;
   const selected = tickets.filter((t) => selectedIds.includes(t.id));
   const discounted = selected.filter((t) => t.discount_price != null);
-  const discountSum = discounted.reduce(
-    (acc, t) => acc + Number(t.discount_price),
-    0
-  );
+  const discountSum = discounted.reduce((acc, t) => acc + Number(t.discount_price), 0);
   const adjustedTotal =
     discounted.length === 0
       ? total
-      : computeWithDiscounts(count - discounted.length, discountSum);
-  const adjustedBreakdown =
-    discounted.length === 0
-      ? breakdown
-      : `${breakdown ? breakdown + " + " : ""}${discounted.length} ticket(s) prix spécial`;
+      : (() => {
+          const reg = count - discounted.length;
+          const fives = Math.floor(reg / 5);
+          const rem = reg % 5;
+          const threes = Math.floor(rem / 3);
+          const ones = rem % 3;
+          return fives * 7 + threes * 5 + ones * 2 + discountSum;
+        })();
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-emerald-200 bg-white/95 backdrop-blur">
+    <div
+      className="fixed inset-x-0 bottom-0 z-40 border-t"
+      style={{ backgroundColor: "oklch(1 0 0 / 0.95)", borderColor: "var(--border)", backdropFilter: "blur(12px)" }}
+    >
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-abil-ink">
+          <p className="text-sm font-semibold">
             {count} ticket{count > 1 ? "s" : ""} sélectionné{count > 1 ? "s" : ""}
           </p>
-          {adjustedBreakdown && (
-            <p className="text-xs text-slate-500">{adjustedBreakdown}</p>
-          )}
+          {breakdown && <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{breakdown}</p>}
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
             <p className="label">Total</p>
-            <p className="text-2xl font-black text-abil-green">
+            <p className="text-2xl font-black" style={{ color: "var(--primary)" }}>
               {formatEUR(adjustedTotal)}
             </p>
           </div>
-          <button onClick={clear} className="btn-secondary !px-3 !py-2 text-sm">
+          <button onClick={clear} className="btn-outline !px-3 !py-2 text-sm">
             Vider
           </button>
           <Link href="/checkout" className="btn-primary">
@@ -60,13 +58,4 @@ export default function CartBar({ tickets }: { tickets: TicketWithBuyer[] }) {
       </div>
     </div>
   );
-}
-
-// price for the non-discounted subset + flat addition of discount overrides
-function computeWithDiscounts(regular: number, discountSum: number) {
-  const fives = Math.floor(regular / 5);
-  const rem = regular % 5;
-  const threes = Math.floor(rem / 3);
-  const ones = rem % 3;
-  return fives * 7 + threes * 5 + ones * 2 + discountSum;
 }

@@ -16,44 +16,28 @@ export default function AdminLoginPage() {
     setError(null);
     setSubmitting(true);
     const supabase = createSupabaseBrowserClient();
-    const { error: signErr } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (signErr) {
-      setError(signErr.message);
-      setSubmitting(false);
-      return;
-    }
+    const { error: signErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (signErr) { setError(signErr.message); setSubmitting(false); return; }
     router.replace("/admin/dashboard");
     router.refresh();
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="flex min-h-screen items-center justify-center px-4" style={{ backgroundColor: "var(--background)" }}>
       <form onSubmit={onSubmit} className="card w-full max-w-sm space-y-4 p-6">
-        <h1 className="font-display text-2xl font-black">ABIL Admin</h1>
+        <div className="mb-2 text-center">
+          <p className="font-display text-2xl font-black" style={{ color: "var(--primary)" }}>ABIL</p>
+          <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>Interface d'administration</p>
+        </div>
         <div>
           <label className="label">Email</label>
-          <input
-            type="email"
-            className="input mt-1"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <input type="email" className="input mt-1" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
           <label className="label">Mot de passe</label>
-          <input
-            type="password"
-            className="input mt-1"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <input type="password" className="input mt-1" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm" style={{ color: "var(--destructive)" }}>{error}</p>}
         <button type="submit" disabled={submitting} className="btn-primary w-full">
           {submitting ? "Connexion…" : "Se connecter"}
         </button>

@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
   const description = String(form.get("description") ?? "").trim() || null;
   const estimatedValueRaw = form.get("estimatedValue");
   const displayOrderRaw = form.get("displayOrder");
+  const quantityRaw = form.get("quantity");
   const image = form.get("image") as File | null;
 
   if (!name) return NextResponse.json({ error: "invalid_name" }, { status: 400 });
@@ -26,6 +27,10 @@ export async function POST(req: NextRequest) {
     typeof displayOrderRaw === "string" && displayOrderRaw.trim()
       ? Number(displayOrderRaw)
       : 0;
+  const quantity = Math.max(
+    1,
+    typeof quantityRaw === "string" && quantityRaw.trim() ? Number(quantityRaw) : 1
+  );
 
   const supabase = createSupabaseServiceClient();
 
@@ -46,19 +51,18 @@ export async function POST(req: NextRequest) {
     imageUrl = pub.publicUrl;
   }
 
-  const { data, error } = await supabase
-    .from("prizes")
-    .insert({
-      name,
-      description,
-      estimated_value: estimatedValue,
-      display_order: displayOrder,
-      image_url: imageUrl
-    })
-    .select()
-    .single();
+  // Insert `quantity` rows with the same name (each is an independent draw)
+  const rows = Array.from({ length: quantity }, (_, i) => ({
+    name,
+    description,
+    estimated_value: estimatedValue,
+    display_order: displayOrder + i,
+    image_url: imageUrl
+  }));
+
+  const { data, error } = await supabase.from("prizes").insert(rows).select();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ prize: data });
+  return NextResponse.json({ prizes: data });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -73,10 +77,8 @@ export async function PATCH(req: NextRequest) {
   const updates: Record<string, any> = {};
   if (typeof body.name === "string") updates.name = body.name.trim();
   if ("description" in body) updates.description = body.description ?? null;
-  if ("estimatedValue" in body)
-    updates.estimated_value = body.estimatedValue ?? null;
-  if (typeof body.displayOrder === "number")
-    updates.display_order = body.displayOrder;
+  if ("estimatedValue" in body) updates.estimated_value = body.estimatedValue ?? null;
+  if (typeof body.displayOrder === "number") updates.display_order = body.displayOrder;
   if ("imageUrl" in body) updates.image_url = body.imageUrl ?? null;
 
   const { data, error } = await supabase

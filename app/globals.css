@@ -1,44 +1,221 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+@theme inline {
+  /* ── Fonts ─────────────────────────────────── */
+  --font-sans:    var(--font-barlow), system-ui, sans-serif;
+  --font-heading: var(--font-barlow-condensed), system-ui, sans-serif;
+  --font-mono:    ui-monospace, monospace;
+
+  /* ── Color tokens ───────────────────────────── */
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --color-card:                 var(--card);
+  --color-card-foreground:      var(--card-foreground);
+  --color-primary:              var(--primary);
+  --color-primary-foreground:   var(--primary-foreground);
+  --color-secondary:            var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:                var(--muted);
+  --color-muted-foreground:     var(--muted-foreground);
+  --color-accent:               var(--accent);
+  --color-accent-foreground:    var(--accent-foreground);
+  --color-destructive:          var(--destructive);
+  --color-border:               var(--border);
+  --color-input:                var(--input);
+  --color-ring:                 var(--ring);
+
+  /* ── Radius ─────────────────────────────────── */
+  --radius-sm:  calc(var(--radius) * 0.6);
+  --radius-md:  calc(var(--radius) * 0.8);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.4);
+
+  /* ── Animations ─────────────────────────────── */
+  --animate-sparkle: sparkle 2.4s ease-in-out infinite;
+  --animate-glow:    glow 1.8s ease-in-out infinite;
+  --animate-confetti: confetti 3.5s linear forwards;
+}
+
+/* ══════════════════════════════════════════════
+   PALETTE ABIL — Bleu royal + Jaune shuttlecock
+   ══════════════════════════════════════════════ */
 :root {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Bebas Neue", "Oswald", ui-sans-serif, system-ui, sans-serif;
+  --primary:            oklch(0.55 0.22 265);
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary:            oklch(0.78 0.17 83);
+  --secondary-foreground: oklch(0.13 0.02 265);
+
+  --background:         oklch(0.98 0.005 245);
+  --foreground:         oklch(0.13 0.02 265);
+  --card:               oklch(1 0 0);
+  --card-foreground:    oklch(0.13 0.02 265);
+  --muted:              oklch(0.96 0.015 245);
+  --muted-foreground:   oklch(0.50 0.04 245);
+  --accent:             oklch(0.93 0.03 265);
+  --accent-foreground:  oklch(0.25 0.05 265);
+  --destructive:        oklch(0.57 0.24 27);
+  --border:             oklch(0.91 0.02 245);
+  --input:              oklch(0.91 0.02 245);
+  --ring:               oklch(0.55 0.22 265);
+  --radius:             0.75rem;
 }
 
-html, body {
-  background: #f7faf7;
-  color: theme(colors.abil.ink);
-  font-family: var(--font-sans);
+/* ══════════════════════════════════════════════
+   KEYFRAMES
+   ══════════════════════════════════════════════ */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.05); }
 }
 
-.bg-tombola-hero {
-  background: radial-gradient(circle at 20% 10%, rgba(245,179,1,0.18), transparent 45%),
-              radial-gradient(circle at 80% 30%, rgba(16,185,129,0.25), transparent 50%),
-              linear-gradient(135deg, #0E7C3A 0%, #075226 100%);
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.78 0.17 83 / 0.6); }
+  50%       { box-shadow: 0 0 24px 6px oklch(0.78 0.17 83 / 0.45); }
 }
 
-.btn-primary {
-  @apply inline-flex items-center justify-center rounded-xl bg-abil-green px-5 py-3 font-semibold text-white shadow-lg shadow-emerald-900/20 transition hover:bg-abil-green-dark disabled:opacity-50 disabled:cursor-not-allowed;
+@keyframes confetti {
+  0%   { transform: translateY(-100vh) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg);  opacity: 0; }
 }
 
-.btn-secondary {
-  @apply inline-flex items-center justify-center rounded-xl border border-abil-green px-5 py-3 font-semibold text-abil-green transition hover:bg-abil-green hover:text-white disabled:opacity-50;
+/* ══════════════════════════════════════════════
+   BASE
+   ══════════════════════════════════════════════ */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-barlow), system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-barlow-condensed), system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); }
+  h2 { font-size: clamp(1.4rem,  4vw, 2rem); }
+  h3 { font-size: clamp(1.1rem,  3vw, 1.5rem); }
 }
 
-.btn-gold {
-  @apply inline-flex items-center justify-center rounded-xl bg-abil-gold px-5 py-3 font-semibold text-abil-ink shadow-lg shadow-yellow-900/20 transition hover:brightness-95 disabled:opacity-50;
-}
+/* ══════════════════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════════════════ */
+@layer utilities {
+  .font-display {
+    font-family: var(--font-barlow-condensed), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
 
-.card {
-  @apply rounded-2xl bg-white shadow-md ring-1 ring-black/5;
-}
+  /* Hero tombola (bleu royal ABIL + reflet doré) */
+  .bg-tombola-hero {
+    background:
+      radial-gradient(circle at 20% 10%,  oklch(0.78 0.17 83 / 0.15), transparent 40%),
+      radial-gradient(circle at 80% 30%,  oklch(0.70 0.18 265 / 0.25), transparent 50%),
+      linear-gradient(135deg, oklch(0.42 0.22 265) 0%, oklch(0.55 0.22 265) 50%, oklch(0.48 0.20 255) 100%);
+  }
 
-.label {
-  @apply text-xs font-medium uppercase tracking-wide text-slate-500;
-}
+  .glass {
+    background: oklch(1 0 0 / 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid oklch(0.91 0.02 245 / 0.6);
+  }
 
-.input {
-  @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-abil-ink placeholder:text-slate-400 focus:border-abil-green focus:outline-none focus:ring-2 focus:ring-emerald-200;
+  /* ─ Cards ─ */
+  .card {
+    border-radius: var(--radius-xl);
+    background-color: var(--card);
+    box-shadow: 0 2px 8px oklch(0.13 0.02 265 / 0.07);
+    border: 1px solid var(--border);
+  }
+
+  /* ─ Form ─ */
+  .label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted-foreground);
+  }
+
+  .input {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--input);
+    background-color: var(--card);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    color: var(--foreground);
+  }
+  .input::placeholder {
+    color: var(--muted-foreground);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px oklch(0.55 0.22 265 / 0.15);
+  }
+
+  /* ─ Buttons ─ */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    background-color: var(--primary);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: var(--primary-foreground);
+    box-shadow: 0 4px 16px oklch(0.55 0.22 265 / 0.25);
+    transition: opacity 0.15s, transform 0.15s;
+    cursor: pointer;
+  }
+  .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    border: 1.5px solid var(--primary);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    background-color: transparent;
+    transition: background-color 0.15s, color 0.15s;
+    cursor: pointer;
+  }
+  .btn-outline:hover {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-yellow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    background-color: var(--secondary);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-foreground);
+    box-shadow: 0 4px 16px oklch(0.78 0.17 83 / 0.3);
+    transition: filter 0.15s, transform 0.15s;
+    cursor: pointer;
+  }
+  .btn-yellow:hover { filter: brightness(0.95); transform: translateY(-1px); }
+  .btn-yellow:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 }

@@ -4,47 +4,30 @@ import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProtectedAdminLayout({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default async function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
   const auth = await requireAdmin();
   if (!auth.ok) redirect("/admin/login");
 
   return (
     <>
-      <nav className="border-b border-slate-200 bg-white">
+      <nav style={{ borderBottom: "1px solid var(--border)", backgroundColor: "var(--card)" }}>
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-6 px-6 py-3">
-          <Link
-            href="/admin/dashboard"
-            className="font-display text-xl font-black"
-          >
+          <Link href="/admin/dashboard" className="font-display text-xl font-black" style={{ color: "var(--primary)" }}>
             ABIL Admin
           </Link>
-          <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-            <Link href="/admin/dashboard" className="hover:text-abil-green">
-              Dashboard
-            </Link>
-            <Link href="/admin/tickets" className="hover:text-abil-green">
-              Tickets
-            </Link>
-            <Link href="/admin/prizes" className="hover:text-abil-green">
-              Lots
-            </Link>
-            <Link href="/admin/events" className="hover:text-abil-green">
-              Événements
-            </Link>
-            <Link href="/admin/draw" className="hover:text-abil-green">
-              Tirage
-            </Link>
+          <div className="flex flex-wrap gap-4 text-sm" style={{ color: "var(--muted-foreground)" }}>
+            {[["Dashboard", "/admin/dashboard"], ["Tickets", "/admin/tickets"], ["Lots", "/admin/prizes"], ["Événements", "/admin/events"], ["Tirage", "/admin/draw"]].map(([label, href]) => (
+              <Link key={href} href={href} className="transition hover:text-foreground" style={{ color: "var(--muted-foreground)" }}>
+                {label}
+              </Link>
+            ))}
           </div>
           <div className="ml-auto flex gap-3 text-sm">
-            <Link href="/" className="text-slate-500 hover:text-abil-green">
+            <Link href="/" style={{ color: "var(--muted-foreground)" }} className="hover:text-foreground transition">
               ← Voir le site
             </Link>
             <form action="/api/admin/logout" method="post">
-              <button className="text-slate-500 hover:text-red-600">
+              <button className="transition" style={{ color: "var(--muted-foreground)" }}>
                 Déconnexion
               </button>
             </form>
