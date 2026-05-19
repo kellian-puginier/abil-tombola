@@ -1,0 +1,114 @@
+import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { formatEUR } from "@/lib/pricing";
+
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const supabase = createSupabaseServiceClient();
+
+  const [
+    { count: total },
+    { count: available },
+    { count: sold },
+    { count: won },
+    { data: completed },
+    { data: prizes },
+    { data: recent }
+  ] = await Promise.all([
+    supabase
+      .from("tickets")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true),
+    supabase
+      .from("tickets")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true)
+      .eq("status", "available"),
+    supabase
+      .from("tickets")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "sold"),
+    supabase
+      .from("tickets")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "won"),
+    supabase
+      .from("purchases")
+      .select("id, total_amount, buyer_first_name, buyer_last_name, buyer_club")
+      .eq("status", "completed"),
+    supabase.from("prizes").select("id, status"),
+    supabase
+      .from("purchases")
+      .select("*")
+      .eq("status", "completed")
+      .order("completed_at", { ascending: false })
+      .limit(10)
+  ]);
+
+  const revenue = (completed ?? []).reduce(
+    (acc, p: any) => acc + Number(p.total_amount),
+    0
+  );
+  const buyers = new Set(
+    (completed ?? []).map(
+      (p: any) => `${p.buyer_first_name}|${p.buyer_last_name}|${p.buyer_club}`
+    )
+  ).size;
+  const drawn = (prizes ?? []).filter((p: any) => p.status === "drawn").length;
+  const pending = (prizes ?? []).length - drawn;
+
+  return (
+    <main className="space-y-8">
+      <h1 className="font-display text-3xl font-black">Dashboard</h1>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat label="Tickets actifs" value={total ?? 0} />
+        <Stat label="Disponibles" value={available ?? 0} />
+        <Stat label="Vendus" value={(sold ?? 0) + (won ?? 0)} />
+        <Stat label="Gagnés" value={won ?? 0} />
+        <Stat label="Revenu" value={formatEUR(revenue)} />
+        <Stat label="Acheteurs" value={buyers} />
+        <Stat label="Lots tirés" value={drawn} />
+        <Stat label="Lots restants" value={pending} />
+      </section>
+
+      <section className="card overflow-hidden">
+        <header className="border-b border-slate-200 px-5 py-3">
+          <h2 className="font-bold">Derniers achats</h2>
+        </header>
+        <ul className="divide-y divide-slate-200">
+          {(recent ?? []).length === 0 ? (
+            <li className="px-5 py-6 text-slate-500">Aucun achat pour le moment.</li>
+          ) : (
+            (recent ?? []).map((p: any) => (
+              <li key={p.id} className="flex items-center justify-between px-5 py-3">
+                <div>
+                  <p className="font-medium">
+                    {p.buyer_first_name} {p.buyer_last_name}
+                    <span className="text-slate-500"> — {p.buyer_club}</span>
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {p.ticket_ids?.length ?? 0} ticket(s) •{" "}
+                    {new Date(p.completed_at ?? p.created_at).toLocaleString("fr-FR")}
+                  </p>
+                </div>
+                <p className="font-semibold text-abil-green">
+                  {formatEUR(Number(p.total_amount))}
+                </p>
+              </li>
+            ))
+          )}
+        </ul>
+      </section>
+    </main>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="card p-5">
+      <p className="label">{label}</p>
+      <p className="mt-1 text-3xl font-black text-abil-ink">{value}</p>
+    </div>
+  );
+}
