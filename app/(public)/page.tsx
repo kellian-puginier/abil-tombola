@@ -46,8 +46,10 @@ export default async function HomePage() {
       {/* HERO */}
       <section className="bg-tombola-hero text-white">
         <div className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-abil-blanc.png" alt="ABIL" style={{ height: "72px", width: "auto" }} className="mb-6" />
           <p className="mb-3 inline-block rounded-full px-4 py-1 text-sm font-medium tracking-wide" style={{ backgroundColor: "oklch(1 0 0 / 0.12)" }}>
-            ABIL • Tour des Héraults
+            Tour des Héraults
           </p>
           <h1 className="font-display text-4xl font-black leading-tight sm:text-6xl">
             La grande tombola du tournoi

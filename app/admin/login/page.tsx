@@ -25,8 +25,9 @@ export default function AdminLoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4" style={{ backgroundColor: "var(--background)" }}>
       <form onSubmit={onSubmit} className="card w-full max-w-sm space-y-4 p-6">
-        <div className="mb-2 text-center">
-          <p className="font-display text-2xl font-black" style={{ color: "var(--primary)" }}>ABIL</p>
+        <div className="mb-4 flex flex-col items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-abil-noir.png" alt="ABIL" style={{ height: "80px", width: "auto" }} />
           <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>Interface d'administration</p>
         </div>
         <div>

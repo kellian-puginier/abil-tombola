@@ -12,8 +12,10 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
     <>
       <nav style={{ borderBottom: "1px solid var(--border)", backgroundColor: "var(--card)" }}>
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-6 px-6 py-3">
-          <Link href="/admin/dashboard" className="font-display text-xl font-black" style={{ color: "var(--primary)" }}>
-            ABIL Admin
+          <Link href="/admin/dashboard" className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-abil-noir.png" alt="ABIL" style={{ height: "36px", width: "auto" }} />
+            <span className="font-display text-sm font-bold" style={{ color: "var(--muted-foreground)" }}>Admin</span>
           </Link>
           <div className="flex flex-wrap gap-4 text-sm" style={{ color: "var(--muted-foreground)" }}>
             {[["Dashboard", "/admin/dashboard"], ["Tickets", "/admin/tickets"], ["Lots", "/admin/prizes"], ["Événements", "/admin/events"], ["Tirage", "/admin/draw"]].map(([label, href]) => (
