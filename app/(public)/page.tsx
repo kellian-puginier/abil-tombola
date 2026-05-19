@@ -12,7 +12,7 @@ async function loadData() {
   const supabase = createSupabaseServiceClient();
   const [{ data: tickets }, { data: bundles }, { data: prizes }, { data: events }, { data: winnerPurchases }] =
     await Promise.all([
-      supabase.from("tickets").select("*").eq("is_active", true).order("display_order", { ascending: true }).order("created_at", { ascending: true }),
+      supabase.from("tickets").select("*").eq("is_active", true).order("ticket_number", { ascending: true, nullsFirst: false }).order("display_order", { ascending: true }),
       supabase.from("bundles").select("*").eq("is_active", true).eq("status", "available").order("created_at", { ascending: false }),
       supabase.from("prizes").select("*").order("display_order", { ascending: true }),
       supabase.from("special_events").select("*").eq("is_active", true).order("created_at", { ascending: false }),
